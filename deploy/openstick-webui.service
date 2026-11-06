@@ -1,0 +1,31 @@
+[Unit]
+Description=OpenStick device management console
+Documentation=file:/usr/local/share/openstick-webui/README.md
+After=network.target NetworkManager.service ModemManager.service ssh.service
+Wants=NetworkManager.service ModemManager.service ssh.service
+
+[Service]
+Type=simple
+User=root
+Group=root
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=GOMEMLIMIT=48MiB
+ExecStart=/usr/local/bin/openstick-webui --listen :443 --http-listen :80 --state /var/lib/openstick-webui
+WorkingDirectory=/var/lib/openstick-webui
+StateDirectory=openstick-webui
+StateDirectoryMode=0700
+UMask=0077
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=15
+KillMode=control-group
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=openstick-webui
+
+# Root access, /dev, and network administration are intentional requirements.
+# Do not enable PrivateDevices/PrivateNetwork/ProtectSystem on this service:
+# these would break management functions and switching to the terminal's user.
+
+[Install]
+WantedBy=multi-user.target
